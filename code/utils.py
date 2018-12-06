@@ -6,6 +6,7 @@
 import cv2
 import torch
 import numpy as np
+import glob
 
 
 def to_numpy(tensor):
@@ -86,6 +87,9 @@ def get_subwindow_tracking(im, pos, model_sz, original_sz, avg_chans, out_mode='
         im_patch = cv2.resize(im_patch_original, (model_sz, model_sz))  # zzp: use cv to get a better speed
     else:
         im_patch = im_patch_original
+
+    image_files = glob.glob("./chips/*") 
+    cv2.imwrite("chips/chip_{0:04d}.png".format(len(image_files)), im_patch)
 
     return im_to_torch(im_patch) if out_mode in 'torch' else im_patch
 

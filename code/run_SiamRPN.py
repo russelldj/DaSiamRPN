@@ -6,6 +6,7 @@
 import numpy as np
 from torch.autograd import Variable
 import torch.nn.functional as F
+import pdb
 
 
 from utils import get_subwindow_tracking
@@ -171,7 +172,8 @@ def SiamRPN_track(state, im):
     scale_z = p.exemplar_size / s_z
     d_search = (p.instance_size - p.exemplar_size) / 2
     pad = d_search / scale_z
-    s_x = s_z + 2 * pad
+    #You can scale and translate the search area arbitrarily without much issue
+    s_x = (s_z + 2 * pad ) * min((1 / state["score"] if "score" in state else 1), 10)# the times 2 is a hack # blows up if the target is lost
 
     # extract scaled crops for search region x at previous target position
     x_crop = Variable(get_subwindow_tracking(im, target_pos, p.instance_size, round(s_x), avg_chans).unsqueeze(0))
