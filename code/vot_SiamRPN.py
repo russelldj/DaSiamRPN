@@ -5,17 +5,17 @@
 # --------------------------------------------------------
 #!/usr/bin/python
 
-import vot
-from vot import Rectangle
+from . import vot
+from .vot import Rectangle
 import sys
 import cv2  # imread
 import torch
 import numpy as np
 from os.path import realpath, dirname, join
 
-from net import SiamRPNBIG
-from run_SiamRPN import SiamRPN_init, SiamRPN_track
-from utils import get_axis_aligned_bbox, cxy_wh_2_rect
+from .net import SiamRPNBIG
+from .run_SiamRPN import SiamRPN_init, SiamRPN_track
+from .utils import get_axis_aligned_bbox, cxy_wh_2_rect
 
 # load net
 net_file = join(realpath(dirname(__file__)), 'SiamRPNBIG.model')

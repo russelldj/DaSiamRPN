@@ -10,7 +10,7 @@ import torch.nn.functional as F
 class SiamRPN(nn.Module):
     def __init__(self, size=2, feature_out=512, anchor=5):
         configs = [3, 96, 256, 384, 384, 256]
-        configs = list(map(lambda x: 3 if x==3 else x*size, configs))
+        configs = list([3 if x==3 else x*size for x in configs])
         feat_in = configs[-1]
         super(SiamRPN, self).__init__()
         self.featureExtract = nn.Sequential(

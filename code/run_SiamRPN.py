@@ -9,7 +9,7 @@ import torch.nn.functional as F
 import pdb
 
 
-from utils import get_subwindow_tracking
+from .utils import get_subwindow_tracking
 
 
 def generate_anchor(total_stride, scales, ratios, score_size):
@@ -60,7 +60,7 @@ class TrackerConfig(object):
     adaptive = True
 
     def update(self, cfg):
-        for k, v in cfg.items():
+        for k, v in list(cfg.items()):
             setattr(self, k, v)
         self.score_size = (self.instance_size - self.exemplar_size) / self.total_stride + 1
 

@@ -1,6 +1,6 @@
-from net import SiamRPNvot#, SiamRPNBIG
-from run_SiamRPN import SiamRPN_init, SiamRPN_track
-from utils import get_axis_aligned_bbox, cxy_wh_2_rect
+from .net import SiamRPNvot#, SiamRPNBIG
+from .run_SiamRPN import SiamRPN_init, SiamRPN_track
+from .utils import get_axis_aligned_bbox, cxy_wh_2_rect
 
 from os.path import realpath, dirname, join
 import glob

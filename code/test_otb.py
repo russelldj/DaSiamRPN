@@ -10,9 +10,9 @@ import numpy as np
 from os import makedirs
 from os.path import realpath, dirname, join, isdir, exists
 
-from net import SiamRPNotb
-from run_SiamRPN import SiamRPN_init, SiamRPN_track
-from utils import rect_2_cxy_wh, cxy_wh_2_rect
+from .net import SiamRPNotb
+from .run_SiamRPN import SiamRPN_init, SiamRPN_track
+from .utils import rect_2_cxy_wh, cxy_wh_2_rect
 
 parser = argparse.ArgumentParser(description='PyTorch SiamRPN OTB Test')
 parser.add_argument('--dataset', dest='dataset', default='OTB2015', help='datasets')
@@ -63,8 +63,8 @@ def track_video(model, video):
         for x in regions:
             fin.write(','.join([str(i) for i in x])+'\n')
 
-    print('({:d}) Video: {:12s} Time: {:02.1f}s Speed: {:3.1f}fps'.format(
-        v_id, video['name'], toc, f / toc))
+    print(('({:d}) Video: {:12s} Time: {:02.1f}s Speed: {:3.1f}fps'.format(
+        v_id, video['name'], toc, f / toc)))
     return f / toc
 
 
@@ -75,7 +75,7 @@ def load_dataset(dataset):
         exit()
     json_path = join(realpath(dirname(__file__)), 'data', dataset + '.json')
     info = json.load(open(json_path, 'r'))
-    for v in info.keys():
+    for v in list(info.keys()):
         path_name = info[v]['name']
         info[v]['image_files'] = [join(base_path, path_name, 'img', im_f) for im_f in info[v]['image_files']]
         info[v]['gt'] = np.array(info[v]['gt_rect'])-[1,1,0,0]  # our tracker is 0-index
@@ -95,7 +95,7 @@ def main():
     fps_list = []
     for v_id, video in enumerate(dataset.keys()):
         fps_list.append(track_video(net, dataset[video]))
-    print('Mean Running Speed {:.1f}fps'.format(np.mean(np.array(fps_list))))
+    print(('Mean Running Speed {:.1f}fps'.format(np.mean(np.array(fps_list)))))
 
 
 if __name__ == '__main__':

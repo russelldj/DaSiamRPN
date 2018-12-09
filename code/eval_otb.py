@@ -87,7 +87,7 @@ def eval_auc(dataset='OTB2015', tracker_reg='S*', start=0, end=1e6):
         gt_center = convert_bb_to_center(gt_rect)
         for j in range(len(trackers)):
             tracker = trackers[j]
-            print('{:d} processing:{} tracker: {}'.format(i, seq, tracker))
+            print(('{:d} processing:{} tracker: {}'.format(i, seq, tracker)))
             bb = get_result_bb(tracker, seq)
             center = convert_bb_to_center(bb)
             success_overlap[i][j] = compute_success_overlap(gt_rect, bb)
@@ -107,7 +107,7 @@ def eval_auc(dataset='OTB2015', tracker_reg='S*', start=0, end=1e6):
             if auc > max_auc_OTB2013:
                 max_auc_OTB2013 = auc
                 max_name_OTB2013 = trackers[i]
-            print('%s(OTB2013 AUC:%.4f)' % (trackers[i], auc))
+            print(('%s(OTB2013 AUC:%.4f)' % (trackers[i], auc)))
 
         max_auc = 0.
         max_name = ''
@@ -116,10 +116,10 @@ def eval_auc(dataset='OTB2015', tracker_reg='S*', start=0, end=1e6):
             if auc > max_auc:
                 max_auc = auc
                 max_name = trackers[i]
-            print('%s(OTB2015 AUC:%.4f)' % (trackers[i], auc))
+            print(('%s(OTB2015 AUC:%.4f)' % (trackers[i], auc)))
 
-        print('\nOTB2013 Best: %s(%.4f)' % (max_name_OTB2013, max_auc_OTB2013))
-        print('\nOTB2015 Best: %s(%.4f)' % (max_name, max_auc))
+        print(('\nOTB2013 Best: %s(%.4f)' % (max_name_OTB2013, max_auc_OTB2013)))
+        print(('\nOTB2015 Best: %s(%.4f)' % (max_name, max_auc)))
     else:
         max_auc = 0.
         max_name = ''
@@ -128,9 +128,9 @@ def eval_auc(dataset='OTB2015', tracker_reg='S*', start=0, end=1e6):
             if auc > max_auc:
                 max_auc = auc
                 max_name = trackers[i]
-            print('%s(%.4f)' % (trackers[i], auc))
+            print(('%s(%.4f)' % (trackers[i], auc)))
 
-        print('\n%s Best: %s(%.4f)' % (dataset, max_name, max_auc))
+        print(('\n%s Best: %s(%.4f)' % (dataset, max_name, max_auc)))
 
 
 if __name__ == "__main__":

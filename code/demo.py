@@ -9,9 +9,9 @@ import glob, cv2, torch
 import numpy as np
 from os.path import realpath, dirname, join
 
-from net import SiamRPNvot
-from run_SiamRPN import SiamRPN_init, SiamRPN_track
-from utils import get_axis_aligned_bbox, cxy_wh_2_rect
+from .net import SiamRPNvot
+from .run_SiamRPN import SiamRPN_init, SiamRPN_track
+from .utils import get_axis_aligned_bbox, cxy_wh_2_rect
 
 # load net
 net = SiamRPNvot()
@@ -41,4 +41,4 @@ for f, image_file in enumerate(image_files):
     cv2.imshow('SiamRPN', im)
     cv2.waitKey(1)
 
-print('Tracking Speed {:.1f}fps'.format((len(image_files)-1)/(toc/cv2.getTickFrequency())))
+print(('Tracking Speed {:.1f}fps'.format((len(image_files)-1)/(toc/cv2.getTickFrequency()))))
