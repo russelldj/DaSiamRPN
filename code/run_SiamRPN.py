@@ -158,7 +158,17 @@ def SiamRPN_init(im, target_pos, target_sz, net):
     return state
 
 
-def SiamRPN_track(state, im):
+def SiamRPN_track(state, im, padding=0.0, shift = [0.0, 0.0]):
+    """
+    params
+    ----------  
+    state : dict
+        the previous output state
+    im : np.ndarray
+        The new image to search
+    padding : int
+        Additional width, height to add to the search area
+    """
     p = state['p']
     net = state['net']
     avg_chans = state['avg_chans']
@@ -173,7 +183,10 @@ def SiamRPN_track(state, im):
     d_search = (p.instance_size - p.exemplar_size) / 2
     pad = d_search / scale_z
     #You can scale and translate the search area arbitrarily without much issue
-    s_x = (s_z + 2 * pad ) * min((1 / state["score"] if "score" in state else 1), 10)# the times 2 is a hack # blows up if the target is lost
+    s_x = (s_z + 2 * pad )# * min((1 / state["score"] if "score" in state else 1), 10)# the times 2 is a hack # blows up if the target is lost
+    s_x += padding 
+    target_pos[0] += shift[0] # TODO check that this is correct and it doesn't need to be switched
+    target_pos[1] += shift[1] # TODO check that this is correct and it doesn't need to be switched
 
     # extract scaled crops for search region x at previous target position
     x_crop = Variable(get_subwindow_tracking(im, target_pos, p.instance_size, round(s_x), avg_chans).unsqueeze(0))
