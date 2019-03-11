@@ -7,10 +7,9 @@ import numpy as np
 from torch.autograd import Variable
 import torch.nn.functional as F
 import pdb
-
+import copy
 
 from .utils import get_subwindow_tracking
-
 
 def generate_anchor(total_stride, scales, ratios, score_size):
     anchor_num = len(ratios) * len(scales)
@@ -67,8 +66,9 @@ class TrackerConfig(object):
 
 def tracker_eval(net, x_crop, target_pos, target_sz, window, scale_z, p):
     delta, score = net(x_crop)
-
+    
     delta = delta.permute(1, 2, 3, 0).contiguous().view(4, -1).data.cpu().numpy()
+    # Is this the response map
     score = F.softmax(score.permute(1, 2, 3, 0).contiguous().view(2, -1), dim=0).data[1, :].cpu().numpy()
 
     delta[0, :] = delta[0, :] * p.anchor[:, 2] + p.anchor[:, 0]
@@ -185,8 +185,12 @@ def SiamRPN_track(state, im, padding=0.0, shift = [0.0, 0.0]):
     #You can scale and translate the search area arbitrarily without much issue
     s_x = (s_z + 2 * pad )# * min((1 / state["score"] if "score" in state else 1), 10)# the times 2 is a hack # blows up if the target is lost
     s_x += padding 
+    s_x = min(s_x, 2 * max(*im.shape))
+    print(s_x, target_pos)
     target_pos[0] += shift[0] # TODO check that this is correct and it doesn't need to be switched
     target_pos[1] += shift[1] # TODO check that this is correct and it doesn't need to be switched
+
+    crop_region = [target_pos[0] - s_x / 2, target_pos[1] - s_x / 2, target_pos[0] + s_x / 2, target_pos[1] + s_x / 2]
 
     # extract scaled crops for search region x at previous target position
     x_crop = Variable(get_subwindow_tracking(im, target_pos, p.instance_size, round(s_x), avg_chans).unsqueeze(0))
@@ -199,4 +203,4 @@ def SiamRPN_track(state, im, padding=0.0, shift = [0.0, 0.0]):
     state['target_pos'] = target_pos
     state['target_sz'] = target_sz
     state['score'] = score
-    return state
+    return state, crop_region

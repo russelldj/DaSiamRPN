@@ -11,7 +11,7 @@ import numpy as np
 This is a very light wrapper around the other functionality which encapsulates the state
 """
 class SiamRPN_tracker(object):
-    def __init__(self, image, ltwh_bbox, lost_conf=0.8, expand_rate=20):
+    def __init__(self, image, ltwh_bbox, lost_conf=0.85, found_conf=0.95, expand_rate=20):
         """
         params
         ---------- 
@@ -22,6 +22,7 @@ class SiamRPN_tracker(object):
         """
         # constants
         self.lost_conf = lost_conf
+        self.found_conf = found_conf
         self.expand_rate = expand_rate
         self.padding = 0
 
@@ -59,15 +60,15 @@ class SiamRPN_tracker(object):
         #d_search = (p.instance_size - p.exemplar_size) / 2
         #pad = d_search / scale_z
 
-        new_state = SiamRPN_track(self.state, image, self.padding)
+        new_state, crop_region = SiamRPN_track(self.state, image, self.padding)
         score = new_state["score"]
         if score < self.lost_conf:
             self.padding += self.expand_rate 
-        else:
+        elif score > self.found_conf:
             self.padding = 0
 
         ltwh = cxy_wh_2_rect(new_state['target_pos'], new_state['target_sz'])
         ltwh = [int(x) for x in ltwh]
         self.state = new_state
 
-        return ltwh, score
+        return ltwh, score, crop_region
