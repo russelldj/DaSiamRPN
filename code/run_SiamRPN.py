@@ -146,7 +146,8 @@ def SiamRPN_init(im, target_pos, target_sz, net):
     if p.windowing == 'cosine':
         window = np.outer(np.hanning(p.score_size), np.hanning(p.score_size))
     elif p.windowing == 'uniform':
-        window = np.ones((p.score_size, p.score_size))
+        pdb.set_trace()
+        window = np.ones((int(p.score_size), int(p.score_size)))
     window = np.tile(window.flatten(), p.anchor_num)
 
     state['p'] = p
@@ -185,6 +186,7 @@ def SiamRPN_track(state, im, padding=0.0, shift = [0.0, 0.0]):
     #You can scale and translate the search area arbitrarily without much issue
     s_x = (s_z + 2 * pad )# * min((1 / state["score"] if "score" in state else 1), 10)# the times 2 is a hack # blows up if the target is lost
     s_x += padding 
+    pdb.set_trace()
     s_x = min(s_x, 2 * max(*im.shape))
     print(s_x, target_pos)
     target_pos[0] += shift[0] # TODO check that this is correct and it doesn't need to be switched

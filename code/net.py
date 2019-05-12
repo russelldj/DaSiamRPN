@@ -5,7 +5,7 @@
 # --------------------------------------------------------
 import torch.nn as nn
 import torch.nn.functional as F
-
+import pdb
 
 class SiamRPN(nn.Module):
     def __init__(self, size=2, feature_out=512, anchor=5):
@@ -48,16 +48,20 @@ class SiamRPN(nn.Module):
 
     def forward(self, x):
         x_f = self.featureExtract(x)
-        return self.regress_adjust(F.conv2d(self.conv_r2(x_f), self.r1_kernel)), \
+        res = self.regress_adjust(F.conv2d(self.conv_r2(x_f), self.r1_kernel)), \
                F.conv2d(self.conv_cls2(x_f), self.cls1_kernel)
+        #pdb.set_trace()
+        return res
 
     def temple(self, z):
         z_f = self.featureExtract(z)
+        #pdb.set_trace()
         r1_kernel_raw = self.conv_r1(z_f)
         cls1_kernel_raw = self.conv_cls1(z_f)
         kernel_size = r1_kernel_raw.data.size()[-1]
         self.r1_kernel = r1_kernel_raw.view(self.anchor*4, self.feature_out, kernel_size, kernel_size)
         self.cls1_kernel = cls1_kernel_raw.view(self.anchor*2, self.feature_out, kernel_size, kernel_size)
+        #pdb.set_trace()
 
 
 class SiamRPNBIG(SiamRPN):

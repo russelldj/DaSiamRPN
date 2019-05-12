@@ -6,12 +6,14 @@ from os.path import realpath, dirname, join
 import glob
 import torch
 import numpy as np
+import pdb
+import copy
 
 """
 This is a very light wrapper around the other functionality which encapsulates the state
 """
 class SiamRPN_tracker(object):
-    def __init__(self, image, ltwh_bbox, lost_conf=0.85, found_conf=0.95, expand_rate=20):
+    def __init__(self, image, ltwh_bbox, lost_conf=0.80, found_conf=0.95, expand_rate=5):
         """
         params
         ---------- 
@@ -19,13 +21,18 @@ class SiamRPN_tracker(object):
             This is the first frame in the tracking sequence 
         ltwh_bbox : ArrayLike
             this is the location of the box in the first frame, given as [left, top, width, height]
+        lost_conf : float
+            This is taken from page 10 of the DaSiamRPN paper
+        found_conf : float
+            This is also taken from page 10 of the DaSiamRPN paper
+        expand_rate : int
+            the number of pixels to grow when lost 
         """
         # constants
         self.lost_conf = lost_conf
         self.found_conf = found_conf
         self.expand_rate = expand_rate
         self.padding = 0
-
 
         # initialize the network
         self.net = SiamRPNvot() # TODO determine the difference between *vot and *big
@@ -39,6 +46,50 @@ class SiamRPN_tracker(object):
 
         # Initialize the actual tracker, which is now stored in the state dict
         self.state = SiamRPN_init(image, target_pos, target_sz, self.net)
+        self.conf = 1.0 # completely sure when we start
+
+    def getConf(self):
+        return self.state["conf"]
+
+    def getLostConf(self):
+        return self.lost_conf
+
+    def getLocation(self):
+        location = self.state["target_pos"]
+        return location
+
+    def isLost(self):
+        return self.conf < self.lost_conf
+
+    def setSearchRegion(self, search_region):
+        """
+        search_region : ArrayLike[int]
+            The [l, t, w, h] bounding box to search
+        """
+        # you have to set the self.state["target_pos"] = array(center)
+        # and self.state["target_size"] = array([x, y])
+    
+        centered = self.xywh_to_centered(search_region)
+        print("setting the search region to {}".format(centered))
+        self.state["target_pos"] = np.asarray(centered[0:2])
+        self.state["target_sz"] = np.asarray(centered[2:])
+
+    def setSearchLocation(self, search_location):
+        """
+        search_region : ArrayLike[int]
+            The x, y location to search around (centered)
+        """
+        assert len(search_location) == 2
+        self.state["target_pos"] = np.asarray(search_location)
+
+    def xywh_to_centered(self, xywh):
+        """
+        xywh : ArrayLike[Number]
+        """
+        centered = copy.copy(xywh)
+        centered[0] += xywh[2] // 2 # integer division in case of int
+        centered[1] += xywh[3] // 2 # integer division in case of int
+        return centered
 
     def predict(self, image):
         """
@@ -69,6 +120,12 @@ class SiamRPN_tracker(object):
 
         ltwh = cxy_wh_2_rect(new_state['target_pos'], new_state['target_sz'])
         ltwh = [int(x) for x in ltwh]
-        self.state = new_state
+        # HACK
+        #for key in new_state.keys():
+        #    if key != "net":
+        #        self.state[key] = new_state[key]
+
+        #self.state = new_state
+        self.conf = score
 
         return ltwh, score, crop_region
