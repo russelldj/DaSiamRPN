@@ -13,7 +13,7 @@ import copy
 This is a very light wrapper around the other functionality which encapsulates the state
 """
 class SiamRPN_tracker(object):
-    def __init__(self, image, ltwh_bbox, lost_conf=0.80, found_conf=0.95, expand_rate=5):
+    def __init__(self, image, ltwh_bbox, lost_conf=0.80, found_conf=0.95, expand_rate=0):
         """
         params
         ---------- 
@@ -112,20 +112,20 @@ class SiamRPN_tracker(object):
         #pad = d_search / scale_z
 
         new_state, crop_region = SiamRPN_track(self.state, image, self.padding)
+        p = new_state['p']
+        print(p.exemplar_size)
+        print(p.context_amount)
+        print(p.instance_size)
         score = new_state["score"]
         if score < self.lost_conf:
-            self.padding += self.expand_rate 
+            self.padding = self.expand_rate# this represents that the paper states that it expands in one timestep to the max size
         elif score > self.found_conf:
             self.padding = 0
 
         ltwh = cxy_wh_2_rect(new_state['target_pos'], new_state['target_sz'])
         ltwh = [int(x) for x in ltwh]
-        # HACK
-        #for key in new_state.keys():
-        #    if key != "net":
-        #        self.state[key] = new_state[key]
 
-        #self.state = new_state
+        self.state = new_state
         self.conf = score
 
         return ltwh, score, crop_region

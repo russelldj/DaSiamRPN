@@ -186,7 +186,6 @@ def SiamRPN_track(state, im, padding=0.0, shift = [0.0, 0.0]):
     #You can scale and translate the search area arbitrarily without much issue
     s_x = (s_z + 2 * pad )# * min((1 / state["score"] if "score" in state else 1), 10)# the times 2 is a hack # blows up if the target is lost
     s_x += padding 
-    pdb.set_trace()
     s_x = min(s_x, 2 * max(*im.shape))
     print(s_x, target_pos)
     target_pos[0] += shift[0] # TODO check that this is correct and it doesn't need to be switched
